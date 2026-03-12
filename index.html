@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniConnect CRM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>OmniConnect</h2>
+        <nav>
+            <p><strong>📊 Dashboard</strong></p>
+            <p>👥 Customers</p>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="form-card">
+            <h2>Customer Management</h2>
+            <div class="input-group">
+                <input type="text" id="name" placeholder="Customer Name">
+                <input type="text" id="phone" placeholder="Phone Number">
+                <button class="btn-add" onclick="addCustomer()">Add New Customer</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customerList">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
