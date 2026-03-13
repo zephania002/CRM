@@ -6,6 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the current directory
+app.use(express.static('.'));
+
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -30,9 +33,10 @@ app.get('/customers', async (req, res) => {
 app.post('/customers', async (req, res) => {
   try {
     const { name, phone } = req.body;
+
     const results = await pool.query(
-      'INSERT INTO customers (name, phone) VALUES ($1, $2) RETURNING *', 
-      [name, phone]
+      'INSERT INTO customers (name, phone,status) VALUES ($1, $2,$3) RETURNING *', 
+      [name, phone,'New']
     );
     res.json(results.rows[0]);
   } catch (err) {
@@ -59,19 +63,16 @@ app.delete('/customers/:id', async (req, res) => {
 app.put('/customers/:id', async (req, res) => {
   try { 
     const { id } = req.params;
-    const { name, phone } = req.body;
-    const result = await pool.query(
-      'UPDATE customers SET name = $1, phone = $2 WHERE id = $3 RETURNING *', 
-      [name, phone, id]
+    const { name, phone, status } = req.body;
+     await pool.query(
+      'UPDATE customers SET name = $1, phone = $2, status = $3 WHERE id = $4 RETURNING *', 
+      [name, phone, status, id]
     );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: 'Customer not found' });
-    }
-    res.json({ message: 'Customer updated', customer: result.rows[0] });
+    res.json({ message: 'Customer updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   } 
+
 });
 
 // --- START SERVER ---
