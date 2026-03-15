@@ -22,9 +22,10 @@ const pool = new Pool({
 // 1. GET all customers
 app.get('/customers', async (req, res) => {
   try {
-    const results = await pool.query('SELECT * FROM customers ORDER BY id DESC');
+    const results = await pool.query('SELECT * FROM customers ORDER BY created_at DESC');
     res.json(results.rows);
   } catch (err) {
+    console.error("Error fetching customers:", err.message);
     res.status(500).json({ error: err.message });
   }
 });

@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OmniConnect | CRM Dashboard</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -41,8 +42,11 @@
                 </section>
 
                 <section class="card stats-section">
-                    <h3>Quick Stats</h3>
-                    <div class="stat-item">
+                    <h3>Lead Analytics</h3>
+                    <div style="max-width: 200px; margin: 0 auto;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="stat-item" style="margin-top: 15px; border-top: 1px solid #eee; pt-10">
                         <span>Total Leads</span>
                         <strong id="totalCount">0</strong>
                     </div>
@@ -54,8 +58,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Name</th>
+                                    <th>Name & Date</th>
                                     <th>Phone</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -70,4 +75,4 @@
 
     <script src="script.js"></script>
 </body>
-</html>
+</html> 
