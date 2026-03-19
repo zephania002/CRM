@@ -1,28 +1,25 @@
 const API_URL = 'http://localhost:5000/customers';
-let myChart = null; // Store chart instance to prevent duplicates
+let myChart = null; 
 
 // 1. Load and Display
 async function loadCustomers() {
     try {
         const response = await fetch(API_URL);
         
-        // 1. Check if the server actually sent data
         if (!response.ok) {
             const errorData = await response.json();
             console.error("Server Error Details:", errorData);
-            alert("Server Error: " + (errorData.error || "Unknown error"));
-            return; // Stop here if there is a server error
+            return; 
         }
 
         const customers = await response.json();
         
-        // 2. Extra safety: Check if 'customers' is an array
         if (!Array.isArray(customers)) {
             console.error("Expected an array, but received:", customers);
             return;
         }
 
-        // Update stats
+        // Update stats counter
         const totalCountEl = document.getElementById('totalCount');
         if(totalCountEl) totalCountEl.innerText = customers.length;
 
@@ -30,8 +27,12 @@ async function loadCustomers() {
         const list = document.getElementById('customerList');
         list.innerHTML = customers.map(c => {
             const statusText = c.status || 'New';
-            const badgeClass = statusText.toLowerCase() === 'closed' ? 'badge-success' : 
-                               statusText.toLowerCase() === 'contacted' ? 'badge-info' : 'badge-new';
+            
+            // Modern badge colors matching the analytics
+            const badgeClass = 
+                statusText === 'Closed' ? 'badge-success' : 
+                statusText === 'Contacted' ? 'badge-info' : 
+                statusText === 'Interested' ? 'badge-warning' : 'badge-new';
             
             const dateAdded = c.created_at 
                 ? new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) 
@@ -48,9 +49,11 @@ async function loadCustomers() {
                     <td>${c.phone}</td>
                     <td><span class="badge ${badgeClass}">${statusText}</span></td>
                     <td>
-                        <a href="https://wa.me/${cleanPhone}" target="_blank" class="btn-whatsapp">WhatsApp</a>
-                        <button class="btn-edit" onclick="editCustomer(${c.id}, '${c.name}', '${c.phone}', '${statusText}')">Edit</button>
-                        <button class="btn-delete" onclick="deleteCustomer(${c.id})">Delete</button>
+                        <div class="action-buttons">
+                            <a href="https://wa.me/${cleanPhone}" target="_blank" class="btn-whatsapp">WhatsApp</a>
+                            <button class="btn-edit" onclick="editCustomer(${c.id}, '${c.name}', '${c.phone}', '${statusText}')">Edit</button>
+                            <button class="btn-delete" onclick="deleteCustomer(${c.id})">Delete</button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -59,7 +62,7 @@ async function loadCustomers() {
         updateChart(customers);
 
     } catch (error) {
-        console.error("Network or Syntax Error:", error);
+        console.error("Load failed:", error);
     }
 }
 
@@ -68,27 +71,16 @@ function updateChart(customers) {
     const ctx = document.getElementById('statusChart');
     if (!ctx) return;
 
-    // Count customers per status
-    const statusCounts = {
-        'New': 0,
-        'Contacted': 0,
-        'Interested': 0,
-        'Closed': 0
-    };
+    const statusCounts = { 'New': 0, 'Contacted': 0, 'Interested': 0, 'Closed': 0 };
 
     customers.forEach(c => {
         const status = c.status || 'New';
         if (statusCounts.hasOwnProperty(status)) {
             statusCounts[status]++;
-        } else {
-            statusCounts['New']++;
         }
     });
 
-    // If chart exists, destroy it before creating a new one
-    if (myChart) {
-        myChart.destroy();
-    }
+    if (myChart) { myChart.destroy(); }
 
     myChart = new Chart(ctx, {
         type: 'pie',
@@ -103,41 +95,54 @@ function updateChart(customers) {
         options: {
             responsive: true,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { boxWidth: 12, font: { size: 10 } }
-                }
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
             }
         }
     });
 }
 
-// 3. Add Customer
+// 3. Add Customer (Updated to use the Status Dropdown)
 async function addCustomer() {
     const nameInput = document.getElementById('name');
     const phoneInput = document.getElementById('phone');
+    const statusInput = document.getElementById('status'); // Dropdown from HTML
 
-    if (!nameInput.value || !phoneInput.value) return alert("Fill both fields");
+    if (!nameInput.value || !phoneInput.value) return alert("Please fill name and phone");
 
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 name: nameInput.value, 
-                phone: phoneInput.value 
+                phone: phoneInput.value,
+                status: statusInput.value // Captures selected status
             })
         });
 
-        nameInput.value = '';
-        phoneInput.value = '';
-        loadCustomers();
+        if (response.ok) {
+            nameInput.value = '';
+            phoneInput.value = '';
+            statusInput.value = 'New'; // Reset to default
+            loadCustomers();
+        }
     } catch (error) {
-        console.error("Error adding customer:", error);
+        console.error("Add failed:", error);
     }
 }
 
-// 4. Delete Customer
+// 4. Search/Filter Logic
+function filterCustomers() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#customerList tr');
+
+    rows.forEach(row => {
+        const name = row.querySelector('strong').innerText.toLowerCase();
+        row.style.display = name.includes(term) ? '' : 'none';
+    });
+}
+
+// 5. Delete Customer
 async function deleteCustomer(id) {
     if (confirm("Delete this customer?")) {
         try {
@@ -149,7 +154,7 @@ async function deleteCustomer(id) {
     }
 }
 
-// 5. Edit Customer
+// 6. Edit Customer
 async function editCustomer(id, oldName, oldPhone, oldStatus) {
     const newName = prompt("New Name:", oldName);
     const newPhone = prompt("New Phone:", oldPhone);
@@ -160,11 +165,7 @@ async function editCustomer(id, oldName, oldPhone, oldStatus) {
             await fetch(`${API_URL}/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: newName, 
-                    phone: newPhone, 
-                    status: newStatus 
-                })
+                body: JSON.stringify({ name: newName, phone: newPhone, status: newStatus })
             });
             loadCustomers();
         } catch (error) {

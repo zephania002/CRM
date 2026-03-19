@@ -19,7 +19,7 @@ const pool = new Pool({
 
 // --- ROUTES ---
 
-// 1. GET all customers
+// 1. GET all customers (Sorted by newest first)
 app.get('/customers', async (req, res) => {
   try {
     const results = await pool.query('SELECT * FROM customers ORDER BY created_at DESC');
@@ -30,17 +30,18 @@ app.get('/customers', async (req, res) => {
   }
 });
 
-// 2. ADD a new customer
+// 2. ADD a new customer (Updated to accept Status from the form)
 app.post('/customers', async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, status } = req.body; // Accept status from frontend
 
     const results = await pool.query(
-      'INSERT INTO customers (name, phone,status) VALUES ($1, $2,$3) RETURNING *', 
-      [name, phone,'New']
+      'INSERT INTO customers (name, phone, status) VALUES ($1, $2, $3) RETURNING *', 
+      [name, phone, status || 'New'] // Uses status from form, or defaults to 'New'
     );
     res.json(results.rows[0]);
   } catch (err) {
+    console.error("Error adding customer:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -56,6 +57,7 @@ app.delete('/customers/:id', async (req, res) => {
     }
     res.json({ message: 'Customer deleted' });
   } catch (err) {
+    console.error("Error deleting customer:", err.message);
     res.status(500).json({ error: err.message });
   } 
 });
@@ -65,17 +67,22 @@ app.put('/customers/:id', async (req, res) => {
   try { 
     const { id } = req.params;
     const { name, phone, status } = req.body;
-     await pool.query(
+    
+    const result = await pool.query(
       'UPDATE customers SET name = $1, phone = $2, status = $3 WHERE id = $4 RETURNING *', 
       [name, phone, status, id]
     );
+
+    if (result.rowCount === 0) {
+        return res.status(404).json({ message: 'Customer not found' });
+    }
+
     res.json({ message: 'Customer updated' });
   } catch (err) {
+    console.error("Error updating customer:", err.message);
     res.status(500).json({ error: err.message });
   } 
-
 });
 
 // --- START SERVER ---
-// Keep this at the very bottom
 app.listen(5000, () => console.log('✅ Server running on port 5000'));

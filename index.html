@@ -25,31 +25,41 @@
             <header class="top-bar">
                 <h1>Customer Dashboard</h1>
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search customers..." onkeyup="filterCustomers()">
+                    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="filterCustomers()">
                 </div>
                 <div class="user-profile">Admin User</div>
             </header>
 
             <div class="dashboard-grid">
+                
                 <section class="card form-section">
-                    <h3>Add New Customer</h3>
+                    <h3>Add New Lead</h3>
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="name" placeholder="e.g. John Doe">
+                        <input type="text" id="name" placeholder="Enter name">
                     </div>
                     <div class="form-group">
                         <label>Phone Number</label>
                         <input type="text" id="phone" placeholder="e.g. +254 700 000000">
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Status</label>
+                        <select id="status">
+                            <option value="New">New Lead</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Interested">Interested</option>
+                            <option value="Closed">Closed / Won</option>
+                        </select>
                     </div>
                     <button class="btn-primary" onclick="addCustomer()">Add to Database</button>
                 </section>
 
                 <section class="card stats-section">
                     <h3>Lead Analytics</h3>
-                    <div style="max-width: 200px; margin: 0 auto;">
+                    <div class="chart-container" style="max-width: 180px; margin: 0 auto;">
                         <canvas id="statusChart"></canvas>
                     </div>
-                    <div class="stat-item" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <div class="stat-item" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
                         <span>Total Leads</span>
                         <strong id="totalCount">0</strong>
                     </div>
@@ -72,6 +82,7 @@
                         </table>
                     </div>
                 </section>
+                
             </div>
         </main>
     </div>
