@@ -5,27 +5,39 @@ let myChart = null; // Store chart instance to prevent duplicates
 async function loadCustomers() {
     try {
         const response = await fetch(API_URL);
+        
+        // 1. Check if the server actually sent data
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Server Error Details:", errorData);
+            alert("Server Error: " + (errorData.error || "Unknown error"));
+            return; // Stop here if there is a server error
+        }
+
         const customers = await response.json();
         
-        // Update the stats counter
+        // 2. Extra safety: Check if 'customers' is an array
+        if (!Array.isArray(customers)) {
+            console.error("Expected an array, but received:", customers);
+            return;
+        }
+
+        // Update stats
         const totalCountEl = document.getElementById('totalCount');
         if(totalCountEl) totalCountEl.innerText = customers.length;
 
+        // Render Table
         const list = document.getElementById('customerList');
-        
         list.innerHTML = customers.map(c => {
-            // Determine badge color based on status
             const statusText = c.status || 'New';
             const badgeClass = statusText.toLowerCase() === 'closed' ? 'badge-success' : 
                                statusText.toLowerCase() === 'contacted' ? 'badge-info' : 'badge-new';
             
-            // Format the Date (created_at)
             const dateAdded = c.created_at 
                 ? new Date(c.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) 
                 : 'N/A';
 
-            // Clean phone number for WhatsApp
-            const cleanPhone = c.phone.replace(/\D/g, '');
+            const cleanPhone = c.phone ? c.phone.replace(/\D/g, '') : '';
 
             return `
                 <tr>
@@ -44,11 +56,10 @@ async function loadCustomers() {
             `;
         }).join('');
 
-        // Update the Analytics Chart
         updateChart(customers);
 
     } catch (error) {
-        console.error("Load failed:", error);
+        console.error("Network or Syntax Error:", error);
     }
 }
 
