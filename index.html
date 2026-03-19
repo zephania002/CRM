@@ -24,6 +24,9 @@
         <main class="main-content">
             <header class="top-bar">
                 <h1>Customer Dashboard</h1>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search customers..." onkeyup="filterCustomers()">
+                </div>
                 <div class="user-profile">Admin User</div>
             </header>
 
@@ -46,7 +49,7 @@
                     <div style="max-width: 200px; margin: 0 auto;">
                         <canvas id="statusChart"></canvas>
                     </div>
-                    <div class="stat-item" style="margin-top: 15px; border-top: 1px solid #eee; pt-10">
+                    <div class="stat-item" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
                         <span>Total Leads</span>
                         <strong id="totalCount">0</strong>
                     </div>
@@ -75,4 +78,4 @@
 
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
