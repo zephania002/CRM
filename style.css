@@ -8,6 +8,7 @@
     --white: #ffffff;
     --border: #e2e8f0;
     --success: #22c55e;
+    --danger: #ef4444; /* Added for alerts */
 }
 
 body {
@@ -74,16 +75,98 @@ body {
 .card { background: var(--white); padding: 1.75rem; border-radius: 1rem; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .table-section { grid-column: span 2; }
 
-/* Tab Animation */
-.tab-content { animation: slideIn 0.4s ease-out; }
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* --- KANBAN SPECIFIC STYLES --- */
+.kanban-container {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    margin-top: 1rem;
 }
 
-/* Buttons & Inputs */
-input, select { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; margin-top: 5px; }
-.btn-primary { background: var(--primary); color: white; border: none; padding: 0.85rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: 0.2s; }
+.kanban-column {
+    background: #f1f5f9;
+    border-radius: 12px;
+    min-width: 280px;
+    flex: 1;
+    padding: 1rem;
+    min-height: 500px;
+}
+
+.column-header {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kanban-card {
+    background: var(--white);
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: var(--primary);
+}
+
+.kanban-card strong { display: block; margin-bottom: 0.25rem; font-size: 0.95rem; }
+.kanban-card small { color: var(--text-muted); display: block; margin-bottom: 0.5rem; }
+
+.card-value {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+/* Smart Automation: Stagnant Lead Alert */
+.stagnant-lead {
+    border-left: 4px solid var(--danger);
+    background-color: #fffafb;
+}
+
+.warning-tag {
+    font-size: 9px;
+    color: var(--danger);
+    font-weight: 800;
+    background: #fee2e2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 8px;
+    display: inline-block;
+}
+
+/* View Toggler Buttons */
+.view-controls .btn-edit {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: 0.3s;
+}
+
+.view-controls .btn-edit:hover {
+    background: var(--white);
+    border-color: var(--primary);
+}
+
+/* --- FORM & STATS UPDATES --- */
+input, select { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; margin-top: 5px; box-sizing: border-box; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 0.85rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: 0.2s; width: 100%; margin-top: 1rem;}
 .btn-primary:hover { background: var(--primary-hover); }
 
 /* Table Styling */
@@ -94,9 +177,9 @@ td { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
 /* Badges */
 .badge { padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .badge-new { background: #f1f5f9; color: #475569; }
-.badge-contacted { background: #e0f2fe; color: #0369a1; }
-.badge-interested { background: #fef3c7; color: #92400e; }
-.badge-closed { background: #dcfce7; color: #166534; }
+.badge-info { background: #e0f2fe; color: #0369a1; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-success { background: #dcfce7; color: #166534; }
 
 /* Footer */
 .app-footer { margin-top: auto; padding: 2rem 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); }
